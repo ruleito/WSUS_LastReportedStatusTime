@@ -15,4 +15,4 @@ To use this script, modify the following variables at the beginning of the scrip
 * $SMTPServer: the SMTP server that will be used to send the email
  Save the script to a file with a .ps1 extension and run it from a PowerShell console or schedule it to run on a regular basis using Windows Task Scheduler.
 
-# Note: This script requires that the WSUS PowerShell module is installed on the system running the script. If the module is not already installed, it can be installed by running the following command in a PowerShell console with administrative privileges: Install-WindowsUpdate.
+ Note: This script requires that the WSUS PowerShell module is installed on the system running the script. If the module is not already installed, it can be installed by running the following command in a PowerShell console with administrative privileges: Install-WindowsUpdate.
