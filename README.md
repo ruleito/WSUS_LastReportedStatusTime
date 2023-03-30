@@ -8,11 +8,11 @@ Calls the Test-Array function on the hash tables and adds any failed hosts to th
 Builds an email body with a list of failed hosts and sends an email if there are any failed hosts.
 To use this script, modify the following variables at the beginning of the script to fit your environment:
 
-# $logFile: the path to the log file that will be created to store command output
-# $From: the email address that the email will be sent from
-# $To: the email address that the email will be sent to
-# $Subject: the subject line of the email
-# $SMTPServer: the SMTP server that will be used to send the email
-* Save the script to a file with a .ps1 extension and run it from a PowerShell console or schedule it to run on a regular basis using Windows Task Scheduler.
+* $logFile: the path to the log file that will be created to store command output
+* $From: the email address that the email will be sent from
+* $To: the email address that the email will be sent to
+* $Subject: the subject line of the email
+* $SMTPServer: the SMTP server that will be used to send the email
+ Save the script to a file with a .ps1 extension and run it from a PowerShell console or schedule it to run on a regular basis using Windows Task Scheduler.
 
-* Note: This script requires that the WSUS PowerShell module is installed on the system running the script. If the module is not already installed, it can be installed by running the following command in a PowerShell console with administrative privileges: Install-WindowsUpdate.
+# Note: This script requires that the WSUS PowerShell module is installed on the system running the script. If the module is not already installed, it can be installed by running the following command in a PowerShell console with administrative privileges: Install-WindowsUpdate.
