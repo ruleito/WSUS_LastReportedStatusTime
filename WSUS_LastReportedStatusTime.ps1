@@ -105,3 +105,4 @@ if ($failed_hosts.Count -gt 0) {
         Write-Host "Failed to send email: $($PSItem.Exception.Message)"
     }
 }
+(Get-WsusServer).GetSubscription().StartSynchronization()
