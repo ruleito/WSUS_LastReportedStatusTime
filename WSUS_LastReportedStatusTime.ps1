@@ -1,14 +1,15 @@
 
-$computers = Get-WsusComputer | Where-Object { $_.LastReportedStatusTime -lt (Get-Date).AddHours(-1) -and $_.OSdescription -ne $null }
+$computers = Get-WsusComputer | Where-Object { $_.LastReportedStatusTime -lt (Get-Date).AddHours(-72)}
 
 $hash_table_servers = @{}
 $hash_table_wks = @{}
 $logFile = "C:\Scripts\WSUSCleanup\WindowsUpdate.log"
 $hostname_srv = hostname
-$From = $hostname_srv+"@corp.local"
-$To = "Info@corp.local" 
+$From = $hostname_srv+"@corp.invalid"
+$To = "Informationgroup@corp.invalid"
+# $To_ = "admdti@corp.invalid" 
 $Subject = "WSUS Report state: LastReportStatusTime"
-$SMTPServer = "smtp.corp.local"
+$SMTPServer = "smtp.corp.invalid"
 $SMTPPort = "25"
 $encoding = [System.Text.Encoding]::UTF8
 $failed_hosts = @()
@@ -85,6 +86,22 @@ if ($failed_hosts.Count -gt 0) {
 }
 
 if ($hash_table_wks.Count -gt 0) {
+    $failed_hosts.clear()
     $failed_wks = Test-Array -arrayName $hash_table_wks
     $failed_hosts += $failed_wks
+}
+
+if ($failed_hosts.Count -gt 0) {
+    $Body = "The following hosts have failed to execute the command. LastReportedStatusTime on this hosts 72h+ !!!helpdesk!!!: <br><br>"
+    foreach ($hosts in $failed_hosts) {
+        $Body += $hosts + "<br>"
+    }
+    try {
+        Write-Host "Email body: $Body"
+        Send-MailMessage -From $From -to $To -Subject $Subject -Bodyashtml -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort  -Encoding $encoding -ErrorAction Stop -Verbose
+    }
+    catch {
+        <#Do this if a terminating exception happens#>
+        Write-Host "Failed to send email: $($PSItem.Exception.Message)"
+    }
 }
