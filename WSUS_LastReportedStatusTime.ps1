@@ -7,7 +7,7 @@ $logFile = "C:\Scripts\WSUSCleanup\WindowsUpdate.log"
 $hostname_srv = hostname
 $From = $hostname_srv+"@corp.invalid"
 $To = "Informationgroup@corp.invalid"
-# $To_ = "admdti@corp.invalid" 
+# $To_ = "admd@corp.invalid" 
 $Subject = "WSUS Report state: LastReportStatusTime"
 $SMTPServer = "smtp.corp.invalid"
 $SMTPPort = "25"
@@ -56,7 +56,7 @@ function Test-Array ($arrayName) {
             }
         }
         catch {
-            Write-Host "Error executing command on host $key : $($PSItem.Exception.Message)"
+            Write-Host "Error executing command on host $key : $($PSItem.Exception.Message)" | Out-File $logFile -Append
             $failed_hosts += $key
         }
     }
