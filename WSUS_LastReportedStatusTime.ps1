@@ -1,32 +1,30 @@
-
-$computers = Get-WsusComputer | Where-Object { $_.LastReportedStatusTime -lt (Get-Date).AddHours(-72)}
+$computers = Get-WsusComputer | Where-Object { $_.LastReportedStatusTime -lt (Get-Date).AddHours(-2)}
 
 $hash_table_servers = @{}
 $hash_table_wks = @{}
 $logFile = "C:\Scripts\WSUSCleanup\WindowsUpdate.log"
 $hostname_srv = hostname
-$From = $hostname_srv+"@corp.invalid"
-$To = "Informationgroup@corp.invalid"
-# $To_ = "admd@corp.invalid" 
+$From = $hostname_srv+"@corp.local"
+$To = "InformationGroup@corp.local"
 $Subject = "WSUS Report state: LastReportStatusTime"
-$SMTPServer = "smtp.corp.invalid"
-$SMTPPort = "25"
+$SMTPServer = "smtp.corp.local"
+$SMTPPort = 25
 $encoding = [System.Text.Encoding]::UTF8
 $failed_hosts = @()
 
 foreach ($comp in $computers) {
-    if ($comp.OSdescription -like "*Server*") {
+    if ($comp.OSDescription -like "*Server*") {
         $hash_table_servers[$comp.FullDomainName] = @{
             LastReportedStatusTime = $comp.LastReportedStatusTime
             IPAddress = $comp.IPAddress
-            OSdescription = $comp.OSdescription
+            OSDescription = $comp.OSDescription
         }
     }
-    elseif ($comp.OSdescription -notmatch "Server") {
+    elseif ($comp.OSDescription -notmatch "Server") {
         $hash_table_wks[$comp.FullDomainName] = @{
             LastReportedStatusTime = $comp.LastReportedStatusTime
             IPAddress = $comp.IPAddress
-            OSdescription = $comp.OSdescription
+            OSDescription = $comp.OSDescription
         }
     }
 }
@@ -43,8 +41,7 @@ function Test-Array ($arrayName) {
                     if ([Environment]::OSVersion.Version.Major -ge 10) {
                         usoclient.exe StartScan
                     } else {
-                        wuauclt.exe /resetauthorization
-                        wuauclt /detectnow /reportnow
+                        wuauclt.exe /resetauthorization /detectnow /reportnow
                     }
                 }
                 Invoke-Command -ComputerName $key -ScriptBlock $scriptBlock | Out-File $logFile -Append
@@ -71,16 +68,15 @@ if ($hash_table_servers.Count -gt 0) {
 
 Write-Host $failed_hosts.Count
 if ($failed_hosts.Count -gt 0) {
-    $Body = "The following hosts have failed to execute the command. LastReportedStatusTime on this hosts 72h+ : <br><br>"
+    $Body = "The following hosts have failed to execute the command. LastReportedStatusTime on these hosts is 72h+: <br><br>"
     foreach ($hosts in $failed_hosts) {
         $Body += $hosts + "<br>"
     }
     try {
         Write-Host "Email body: $Body"
-        Send-MailMessage -From $From -to $To -Subject $Subject -Bodyashtml -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort  -Encoding $encoding -ErrorAction Stop -Verbose
+        Send-MailMessage -From $From -to $To -Subject $Subject -BodyAsHtml -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort  -Encoding $encoding -ErrorAction Stop -Verbose
     }
     catch {
-        <#Do this if a terminating exception happens#>
         Write-Host "Failed to send email: $($PSItem.Exception.Message)"
     }
 }
@@ -92,16 +88,15 @@ if ($hash_table_wks.Count -gt 0) {
 }
 
 if ($failed_hosts.Count -gt 0) {
-    $Body = "The following hosts have failed to execute the command. LastReportedStatusTime on this hosts 72h+ !!!helpdesk!!!: <br><br>"
+    $Body = "The following hosts have failed to execute the command. LastReportedStatusTime on these hosts is 72h+ !!!helpdesk!!!: <br><br>"
     foreach ($hosts in $failed_hosts) {
         $Body += $hosts + "<br>"
     }
     try {
         Write-Host "Email body: $Body"
-        Send-MailMessage -From $From -to $To -Subject $Subject -Bodyashtml -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort  -Encoding $encoding -ErrorAction Stop -Verbose
+        Send-MailMessage -From $From -to $To -Subject $Subject -BodyAsHtml -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort  -Encoding$encoding -ErrorAction Stop -Verbose
     }
     catch {
-        <#Do this if a terminating exception happens#>
         Write-Host "Failed to send email: $($PSItem.Exception.Message)"
     }
 }
